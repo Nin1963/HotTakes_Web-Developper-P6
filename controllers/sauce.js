@@ -68,14 +68,14 @@ exports.modifySauce = (req, res, next) => {
       } else {
         const filename = sauce.imageUrl.split("/images/")[1];
         fs.unlink(`images/${filename}`, () => {
-        Sauce.updateOne(
-          { _id: req.params.id },
-          { ...sauceObject, _id: req.params.id }
-        )
-          .then(() => res.status(200).json({ message: "Sauce modifiée!" }))
-          .catch((error) => res.status(400).json({ error }));
-      })
-    }
+          Sauce.updateOne(
+            { _id: req.params.id },
+            { ...sauceObject, _id: req.params.id }
+          )
+            .then(() => res.status(200).json({ message: "Sauce modifiée!" }))
+            .catch((error) => res.status(400).json({ error }));
+        });
+      }
     })
     .catch((error) => {
       res.status(400).json({ error });
@@ -108,7 +108,6 @@ exports.likeDislike = (req, res, next) => {
   let userId = req.body.userId;
   let sauceId = req.params.id;
 
-
   // "J'aime"
   if (req.body.like === 1) {
     Sauce.updateOne(
@@ -118,7 +117,7 @@ exports.likeDislike = (req, res, next) => {
         $inc: { likes: req.body.like++ },
       }
     )
-      .then(() => res.status(200).json({ message: "J\'aime ajouté !" }))
+      .then(() => res.status(200).json({ message: "Add like!" }))
       .catch((error) => res.status(400).json({ error }));
   }
   // "Je n'aime pas"
@@ -127,11 +126,11 @@ exports.likeDislike = (req, res, next) => {
       { _id: req.params.id },
       {
         $push: { usersDisliked: req.body.userId },
-        $inc: { dislikes: req.body.like++ * -1 },
+        $inc: { dislikes: req.body.like * -1},
       }
     )
       .then(() => {
-        res.status(200).json({ message: "Je n\'aime pas ajouté !" });
+        res.status(200).json({ message: "Add dislike !" });
       })
       .catch((error) => res.status(400).json({ error }));
   }
@@ -150,7 +149,7 @@ exports.likeDislike = (req, res, next) => {
           )
             .then(() =>
               res.status(200).json({
-                message: "J\'aime supprimé !",
+                message: "Like removed !",
               })
             )
             .catch((error) =>
@@ -158,9 +157,7 @@ exports.likeDislike = (req, res, next) => {
                 error,
               })
             );
-        }
-        // Suppression du "Je n'aime pas"
-        if (sauce.usersDisliked.includes(req.body.userId)) {
+        } else if (sauce.usersDisliked.includes(req.body.userId)) {
           Sauce.updateOne(
             { _id: req.params.id },
             {
@@ -168,7 +165,7 @@ exports.likeDislike = (req, res, next) => {
               $inc: { dislikes: -1 },
             }
           )
-            .then(() => res.status(200).json({ message: "Je n\'aime pas supprimé !" }))
+            .then(() => res.status(200).json({ message: "Dislike removed !" }))
             .catch((error) => res.status(400).json({ error }));
         }
       })
