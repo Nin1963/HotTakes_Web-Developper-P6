@@ -38,14 +38,14 @@ exports.createSauce = (req, res, next) => {
 
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({
-    _id: req.params.id,
+    _id: req.params.id
   })
     .then((sauce) => {
       res.status(200).json(sauce);
     })
     .catch((error) => {
       res.status(404).json({
-        error: error,
+        error: error
       });
     });
 };
@@ -104,9 +104,9 @@ exports.deleteSauce = (req, res, next) => {
 };
 
 exports.likeDislike = (req, res, next) => {
-  let like = req.body.like;
-  let userId = req.body.userId;
-  let sauceId = req.params.id;
+  // let like = req.body.like;
+  // let userId = req.body.userId;
+  // let sauceId = req.params.id;
 
   // "J'aime"
   if (req.body.like === 1) {
@@ -114,7 +114,7 @@ exports.likeDislike = (req, res, next) => {
       { _id: req.params.id },
       {
         $push: { usersLiked: req.body.userId },
-        $inc: { likes: req.body.like++ },
+        $inc: { likes: 1 },
       }
     )
       .then(() => res.status(200).json({ message: "Add like!" }))
@@ -126,7 +126,7 @@ exports.likeDislike = (req, res, next) => {
       { _id: req.params.id },
       {
         $push: { usersDisliked: req.body.userId },
-        $inc: { dislikes: req.body.like * -1},
+        $inc: { dislikes: 1},
       }
     )
       .then(() => {
